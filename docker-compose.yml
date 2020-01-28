@@ -1,0 +1,59 @@
+version: '3.7'
+services:
+ postgres:
+  restart: always
+  container_name: projectname_postgres
+  build: 
+   context: .
+   dockerfile: dockerfiles/docker_postgres.conf
+#  volumes:
+#      - ./dbdata:/var/lib/postgresql/data
+  networks:  # <-- here
+    - my_network
+  env_file:
+     - .env
+
+ django:
+  restart: always
+  container_name: projectname_django
+  volumes:
+   - ./www:/code
+   - sock:/sock
+  build: 
+   context: .
+   dockerfile: dockerfiles/docker_django.conf
+  depends_on:
+   - postgres
+  command: uwsgi --ini /etc/uwsgi.ini
+  #command: bash -c "python /code/projectname/manage.py collectstatic --noinput && python /code/projectname/manage.py migrate && python /code/projectname/manage.py runserver 0.0.0.0:8000"
+  ports:
+   - "8000:8000"
+  networks:  # <-- here
+   - my_network 
+  env_file:
+     - .env
+
+ nginx:
+  restart: always
+  container_name: projectname_nginx
+  volumes:
+   - ./www:/code
+   - sock:/sock
+  build:
+   context: .
+   dockerfile: dockerfiles/docker_nginx.conf
+  depends_on:
+   - django
+  ports:
+   - "8088:8088"
+  networks:  # <-- here
+   - my_network 
+  env_file:
+     - .env
+
+networks:  # <-- and here
+  my_network:
+    driver: bridge
+
+volumes:
+ sock:
