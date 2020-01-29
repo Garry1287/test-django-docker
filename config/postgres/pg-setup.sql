@@ -1,5 +1,5 @@
 CREATE DATABASE nlmkdb;
-CREATE USER nlmk WITH PASSWORD '915nyg710';
+CREATE USER nlmk WITH PASSWORD '';
 ALTER ROLE nlmk SET client_encoding TO 'utf8';
 ALTER ROLE nlmk SET default_transaction_isolation TO 'read committed';
 ALTER ROLE nlmk SET timezone TO 'UTC';
